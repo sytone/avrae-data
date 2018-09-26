@@ -5,6 +5,22 @@ from utils import get_data, render, recursive_tag
 
 log = logging.getLogger("items")
 
+ITEM_TYPES = {"G": "Adventuring Gear", "SCF": "Spellcasting Focus", "AT": "Artisan Tool", "T": "Tool",
+              "GS": "Gaming Set", "INS": "Instrument", "A": "Ammunition", "M": "Melee Weapon", "R": "Ranged Weapon",
+              "LA": "Light Armor", "MA": "Medium Armor", "HA": "Heavy Armor", "S": "Shield", "W": "Wondrous Item",
+              "P": "Potion", "ST": "Staff", "RD": "Rod", "RG": "Ring", "WD": "Wand", "SC": "Scroll", "EXP": "Explosive",
+              "GUN": "Firearm", "SIMW": "Simple Weapon", "MARW": "Martial Weapon", "$": "Valuable Object",
+              'TAH': "Tack and Harness", 'TG': "Trade Goods", 'MNT': "Mount", 'VEH': "Vehicle", 'SHP': "Ship",
+              'GV': "Generic Variant", 'AF': "Futuristic", 'siege weapon': "Siege Weapon", 'generic': "Generic"}
+
+DMGTYPES = {"B": "bludgeoning", "P": "piercing", "S": "slashing", "N": "necrotic", "R": "radiant"}
+
+SIZES = {"T": "Tiny", "S": "Small", "M": "Medium", "L": "Large", "H": "Huge", "G": "Gargantuan"}
+
+PROPS = {"A": "ammunition", "LD": "loading", "L": "light", "F": "finesse", "T": "thrown", "H": "heavy", "R": "reach",
+         "2H": "two-handed", "V": "versatile", "S": "special", "RLD": "reload", "BF": "burst fire", "CREW": "Crew",
+         "PASS": "Passengers", "CARGO": "Cargo", "DMGT": "Damage Threshold", "SHPREP": "Ship Repairs"}
+
 
 def get_latest_items():
     return get_data("items.json")['item'] + get_data("basicitems.json")['basicitem'] + get_data("magicvariants.json")[
@@ -42,16 +58,11 @@ def object_actions(objects):
 
 
 def srdfilter(data):
-    OVERRIDES = ('+1', '+2', '+3', 'giant strength', 'ioun stone', 'horn of valhalla', 'vorpal', 'of sharpness',
-                 'of answering', 'instrument of the bard', 'nine lives', 'frost brand', 'carpet of flying', 'vicious',
-                 'of wounding', 'of life stealing', 'of protection', 'adamantine', 'of wondrous power', 'luck blade')
-    TYPES = ('W', 'P', 'ST', 'RD', 'RG', 'WD')
     with open('srd/srd-items.txt') as f:
         srd = [s.strip().lower() for s in f.read().split('\n')]
 
     for item in data:
-        if item['name'].lower() in srd or any(i in item['name'].lower() for i in OVERRIDES) or not any(
-                i in item.get('type', '').split(',') for i in TYPES):
+        if item['name'].lower() in srd or (item.get('source') == 'PHB' and not item.get('wondrous')):
             item['srd'] = True
         else:
             item['srd'] = False
@@ -71,8 +82,75 @@ def prerender(data):
     return data
 
 
-def dump(data):
-    with open('out/items.json', 'w') as f:
+def metarender(data):
+    out = []
+    for item in data:
+        if not item['srd']:
+            continue
+
+        damage = ''
+        extras = ''
+        properties = []
+
+        if 'type' in item:
+            type_ = ', '.join(
+                i for i in ([ITEM_TYPES.get(t, 'n/a') for t in item['type'].split(',')] +
+                            ["Wondrous Item" if item.get('wondrous') else ''])
+                if i)
+            for iType in item['type'].split(','):
+                if iType in ('M', 'R', 'GUN'):
+                    damage = f"{item.get('dmg1', 'n/a')} {DMGTYPES.get(item.get('dmgType'), 'n/a')}" \
+                        if 'dmg1' in item and 'dmgType' in item else ''
+                    type_ += f', {item.get("weaponCategory")}'
+                if iType == 'S': damage = f"AC +{item.get('ac', 'n/a')}"
+                if iType == 'LA': damage = f"AC {item.get('ac', 'n/a')} + DEX"
+                if iType == 'MA': damage = f"AC {item.get('ac', 'n/a')} + DEX (Max 2)"
+                if iType == 'HA': damage = f"AC {item.get('ac', 'n/a')}"
+                if iType == 'SHP':  # ships
+                    extras = f"Speed: {item.get('speed')}\nCarrying Capacity: {item.get('carryingcapacity')}\n" \
+                             f"Crew {item.get('crew')}, AC {item.get('vehAc')}, HP {item.get('vehHp')}"
+                    if 'vehDmgThresh' in item:
+                        extras += f", Damage Threshold {item['vehDmgThresh']}"
+                if iType == 'siege weapon':
+                    extras = f"Size: {SIZES.get(item.get('size'), 'Unknown')}\n" \
+                             f"AC {item.get('ac')}, HP {item.get('hp')}\n" \
+                             f"Immunities: {item.get('immune')}"
+        else:
+            type_ = ', '.join(
+                i for i in ("Wondrous Item" if item.get('wondrous') else '', item.get('technology')) if i)
+        rarity = str(item.get('rarity')).replace('None', '')
+        if 'tier' in item:
+            if rarity:
+                rarity += f', {item["tier"]}'
+            else:
+                rarity = item['tier']
+        type_and_rarity = type_ + (f", {rarity}" if rarity else '')
+        value = (item.get('value', 'n/a') + (', ' if 'weight' in item else '')) if 'value' in item else ''
+        weight = (item.get('weight', 'n/a') + (' lb.' if item.get('weight') == '1' else ' lbs.')) \
+            if 'weight' in item else ''
+        weight_and_value = value + weight
+        for prop in item.get('property', []):
+            if not prop: continue
+            a = b = prop
+            a = PROPS.get(a, 'n/a')
+            if b == 'V': a += " (" + item.get('dmg2', 'n/a') + ")"
+            if b in ('T', 'A'): a += " (" + item.get('range', 'n/a') + "ft.)"
+            if b == 'RLD': a += " (" + item.get('reload', 'n/a') + " shots)"
+            properties.append(a)
+        properties = ', '.join(properties)
+        damage_and_properties = f"{damage} - {properties}" if properties else damage
+        damage_and_properties = (' --- ' + damage_and_properties) if weight_and_value and damage_and_properties else \
+            damage_and_properties
+
+        meta = f"*{type_and_rarity}*\n{weight_and_value}{damage_and_properties}\n{extras}"
+        text = item['desc']
+
+        out.append({'name': item['name'], 'meta': meta, 'desc': text})
+    return out
+
+
+def dump(data, filename='items.json'):
+    with open(f'out/{filename}', 'w') as f:
         json.dump(data, f, indent=4)
 
 
@@ -85,7 +163,9 @@ def run():
     data.extend(objects)
     data = srdfilter(data)
     data = prerender(data)
+    sitedata = metarender(data)
     dump(data)
+    dump(sitedata, 'template-items.json')
 
 
 if __name__ == '__main__':
