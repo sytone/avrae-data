@@ -114,7 +114,13 @@ def render(text, md_breaks=False, join_char='\n'):
             elif entry['type'] == 'item':
                 out.append(f"*{entry['name']}* {render(entry['entry'])}")
             elif entry['type'] == 'cell':
-                out.append(render(entry['entry']))
+                if 'entry' in entry:
+                    out.append(render(entry['entry']))
+                else:
+                    if 'exact' in entry['roll']:
+                        out.append(str(entry['roll']['exact']))
+                    else:
+                        out.append(f"{str(entry['roll']['min'])} - {str(entry['roll']['max'])}")
             else:
                 log.warning(f"Missing astranauta entry type parse: {entry}")
 
@@ -136,9 +142,9 @@ PARSING = {'hit': lambda e: f"{int(e):+}",
            'link': lambda e: f"[{e.split('|')[0]}]({e.split('|')[1]})",
            'adventure': lambda e: e.split('|')[0],
            'recharge': lambda e: f"(Recharge {e}-6)" if e else "(Recharge 6)",
-           'chance': lambda e: e.split('|')[1],
+           'chance': lambda e: e.split('|')[1] if len(e.split('|')) > 1 else f"{e.split('|')[0]}%",
            'atk': lambda e: f"{ATK_TYPES.get(e, 'Unknown')} Attack:"}
-IGNORED = ['dice', 'condition', 'skill', 'action', 'creature', 'item', 'spell', 'damage']
+IGNORED = ['dice', 'condition', 'skill', 'action', 'creature', 'item', 'spell', 'damage', 'race']
 
 
 def parse_data_formatting(text):
