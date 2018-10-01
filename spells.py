@@ -7,6 +7,9 @@ VERB_TRANSFORM = {'dispel': 'dispelled', 'discharge': 'discharged'}
 
 log = logging.getLogger("spells")
 
+with open('other/auto_spells.json') as f:
+    auto_spells = json.load(f)
+
 
 def get_spells():
     try:
@@ -124,6 +127,63 @@ def parseclasses(spell):
     log.debug(f"{spell['name']} subclasses: {subclasses}")
 
 
+def get_automation(spell):
+    try:
+        auto_spell = next(s for s in auto_spells if s['name'] == spell['name'])
+    except StopIteration:
+        log.debug("No automation found")
+        return None
+
+    automation = []
+
+
+def spell_context(spell):
+    """:returns str - Spell context."""
+    context = ""
+
+    if spell['type'] == 'save':  # context!
+        if isinstance(spell['text'], list):
+            text = '\n'.join(spell['text'])
+        else:
+            text = spell['text']
+        sentences = text.split('.')
+
+        for i, s in enumerate(sentences):
+            if spell.get('save', {}).get('save').lower() + " saving throw" in s.lower():
+                _sent = []
+                for sentence in sentences[i:i + 3]:
+                    if not '\n\n' in sentence:
+                        _sent.append(sentence)
+                    else:
+                        break
+                _ctx = '. '.join(_sent)
+                if not _ctx.strip() in context:
+                    context += f'{_ctx.strip()}.\n'
+    elif spell['type'] == 'attack':
+        if isinstance(spell['text'], list):
+            text = '\n'.join(spell['text'])
+        else:
+            text = spell['text']
+        sentences = text.split('.')
+
+        for i, s in enumerate(sentences):
+            if " spell attack" in s.lower():
+                _sent = []
+                for sentence in sentences[i:i + 3]:
+                    if not '\n\n' in sentence:
+                        _sent.append(sentence)
+                    else:
+                        break
+                _ctx = '. '.join(_sent)
+                if not _ctx.strip() in context:
+                    context += f'{_ctx.strip()}.\n'
+    else:
+        if 'short' in spell:
+            context = spell['short']
+
+    return context
+
+
 def parse(data):
     processed = []
     for spell in data:
@@ -158,7 +218,7 @@ def parse(data):
             "source": spell['source'],
             "page": spell['page'],
             "concentration": spell['concentration'],
-            "automation": None
+            "automation": get_automation(spell)
         }
         processed.append(recursive_tag(newspell))
     return processed
