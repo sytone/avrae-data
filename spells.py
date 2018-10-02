@@ -135,12 +135,13 @@ def get_automation(spell):
         return None
 
     automation = []
+    data = None
     type_ = auto_spell.get('type')
     if type_ == 'save':
-        savedata = spell['save']
+        savedata = auto_spell['save']
         save = savedata['save'][:3].lower()
         damage = savedata['damage']
-        higher = spell.get("higher_levels", {})
+        higher = auto_spell.get("higher_levels", {})
         data = {
             "type": "target",
             "target": "all",
@@ -178,6 +179,7 @@ def get_automation(spell):
     else:
         pass
     automation.append(data)
+    return automation
 
 
 def spell_context(spell):
