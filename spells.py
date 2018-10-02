@@ -175,9 +175,41 @@ def get_automation(spell):
                     "damage": "{damage}/2"
                 })
     elif type_ == 'attack':
-        pass
+        damage = auto_spell['atk']['damage']
+        higher = auto_spell.get("higher_levels", {})
+        data = {
+            "type": "target",
+            "target": "each",
+            "effects": [
+                {
+                    "type": "attack",
+                    "hit": [
+                        {
+                            "type": "damage",
+                            "damage": damage,
+                            "higher": higher
+                        }
+                    ],
+                    "miss": []
+                }
+            ]
+        }
+        if auto_spell.get('scales', True) and auto_spell['level'] == '0':
+            data['effects'][0]['hit'][0]['cantripScale'] = True
     else:
-        pass
+        damage = auto_spell['damage']
+        higher = auto_spell.get("higher_levels", {})
+        data = {
+            "type": "target",
+            "target": "each",
+            "effects": [
+                {
+                    "type": "damage",
+                    "damage": damage,
+                    "higher": higher
+                }
+            ]
+        }
     automation.append(data)
     return automation
 
@@ -269,15 +301,23 @@ def parse(data):
     return processed
 
 
-def dump(data):
-    with open('out/spells.json', 'w') as f:
+def dump(data, filename='spells.json'):
+    with open(f'out/{filename}', 'w') as f:
         json.dump(data, f, indent=2)
+
+
+def get_auto_only(data):
+    return [{
+        "name": spell['name'],
+        "automation": spell['automation']
+    } for spell in data]
 
 
 def run():
     data = get_spells()
     processed = parse(data)
     dump(processed)
+    dump(get_auto_only(processed), 'spellauto.json')
 
 
 if __name__ == '__main__':
