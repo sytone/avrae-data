@@ -143,7 +143,8 @@ PARSING = {'hit': lambda e: f"{int(e):+}",
            'adventure': lambda e: e.split('|')[0],
            'recharge': lambda e: f"(Recharge {e}-6)" if e else "(Recharge 6)",
            'chance': lambda e: e.split('|')[1] if len(e.split('|')) > 1 else f"{e.split('|')[0]}%",
-           'atk': lambda e: f"{ATK_TYPES.get(e, 'Unknown')} Attack:"}
+           'atk': lambda e: f"{ATK_TYPES.get(e, 'Unknown')} Attack:",
+           'scaledice': lambda e: e.split('|')[-1]}
 IGNORED = ['dice', 'condition', 'skill', 'action', 'creature', 'item', 'spell', 'damage', 'race']
 
 
