@@ -135,6 +135,49 @@ def get_automation(spell):
         return None
 
     automation = []
+    type_ = auto_spell.get('type')
+    if type_ == 'save':
+        savedata = spell['save']
+        save = savedata['save'][:3].lower()
+        damage = savedata['damage']
+        higher = spell.get("higher_levels", {})
+        data = {
+            "type": "target",
+            "target": "all",
+            "effects": [
+                {
+                    "type": "save",
+                    "stat": save,
+                    "fail": [],
+                    "success": []
+                }
+            ]
+        }
+        if damage:
+            data['meta'] = [
+                {
+                    "type": "roll",
+                    "dice": damage,
+                    "name": "damage",
+                    "higher": higher
+                }
+            ]
+            if auto_spell.get('scales', True) and auto_spell['level'] == '0':
+                data['meta'][0]['cantripScale'] = True
+            data['effects'][0]['fail'].append({
+                "type": "damage",
+                "damage": "{damage}"
+            })
+            if savedata['success'] == 'half':
+                data['effects'][0]['success'].append({
+                    "type": "damage",
+                    "damage": "{damage}/2"
+                })
+    elif type_ == 'attack':
+        pass
+    else:
+        pass
+    automation.append(data)
 
 
 def spell_context(spell):
