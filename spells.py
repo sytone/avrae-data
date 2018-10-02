@@ -7,7 +7,7 @@ VERB_TRANSFORM = {'dispel': 'dispelled', 'discharge': 'discharged'}
 
 log = logging.getLogger("spells")
 
-with open('other/auto_spells.json') as f:
+with open('in/auto_spells.json') as f:
     auto_spells = json.load(f)
 
 
