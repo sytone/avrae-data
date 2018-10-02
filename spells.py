@@ -211,6 +211,10 @@ def get_automation(spell):
             ]
         }
     automation.append(data)
+    automation.append({
+        "type": "text",
+        "text": spell_context(auto_spell).strip()
+    })
     return automation
 
 
