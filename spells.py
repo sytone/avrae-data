@@ -1,14 +1,25 @@
 import json
 import logging
+import sys
+
+import requests
 
 from utils import get_json, render, recursive_tag
 
+NEW_AUTOMATION = "oldauto" not in sys.argv
 VERB_TRANSFORM = {'dispel': 'dispelled', 'discharge': 'discharged'}
+SPELL_AUTOMATION_SRC = "https://raw.githubusercontent.com/avrae/avrae-spells/master/spells.json"
 
 log = logging.getLogger("spells")
 
-with open('in/auto_spells.json') as f:
-    auto_spells = json.load(f)
+if not NEW_AUTOMATION:
+    with open('in/auto_spells.json') as f:
+        auto_spells = json.load(f)
+else:
+    auto_spells = requests.get(SPELL_AUTOMATION_SRC).json()
+
+with open('srd/srd-spells.txt') as f:
+    srd_spells = [s.strip().lower() for s in f.read().split('\n')]
 
 
 def get_spells():
@@ -127,15 +138,32 @@ def parseclasses(spell):
     log.debug(f"{spell['name']} subclasses: {subclasses}")
 
 
+def srdfilter(spell):
+    if spell['name'].lower() in srd_spells:
+        spell['srd'] = True
+    else:
+        spell['srd'] = False
+    log.debug(f"{spell['name']} srd: {spell['srd']}")
+
+
 def get_automation(spell):
     try:
         auto_spell = next(s for s in auto_spells if s['name'] == spell['name'])
     except StopIteration:
-        log.debug("No automation found")
+        log.warning("No new automation found!")
+        return None
+    log.debug(f"Found new automation!")
+    return auto_spell['automation']
+
+
+def get_automation_from_old(spell):
+    try:
+        auto_spell = next(s for s in auto_spells if s['name'] == spell['name'])
+    except StopIteration:
+        log.debug("No old automation found.")
         return None
 
     automation = []
-    data = None
     type_ = auto_spell.get('type')
     if type_ == 'save':
         savedata = auto_spell['save']
@@ -274,6 +302,7 @@ def parse(data):
         parsecomponents(spell)
         parseduration(spell)
         parseclasses(spell)
+        srdfilter(spell)
 
         ritual = spell.get('meta', {}).get('ritual', False)
         desc = render(spell['entries'])
@@ -282,6 +311,11 @@ def parse(data):
                 .replace("**At Higher Levels**: ", "")
         else:
             higherlevels = None
+
+        if NEW_AUTOMATION:
+            automation = get_automation(spell)
+        else:
+            automation = get_automation_from_old(spell)
 
         newspell = {
             "name": spell['name'],
@@ -299,7 +333,8 @@ def parse(data):
             "source": spell['source'],
             "page": spell['page'],
             "concentration": spell['concentration'],
-            "automation": get_automation(spell)
+            "automation": automation,
+            "srd": spell['srd']
         }
         processed.append(recursive_tag(newspell))
     return processed
