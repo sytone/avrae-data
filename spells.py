@@ -352,11 +352,26 @@ def get_auto_only(data):
     } for spell in data]
 
 
+def site_parse(data):
+    out = []
+    for spell in data:
+        if not spell['srd']:
+            continue
+        spell['classes'] = ', '.join(spell['classes'])
+        spell['subclasses'] = ', '.join(spell['subclasses'])
+        del spell['srd'], spell['source'], spell['page']
+        out.append(spell)
+    return out
+
+
 def run():
     data = get_spells()
     processed = parse(data)
     dump(processed)
     dump(get_auto_only(processed), 'spellauto.json')
+
+    site_templates = site_parse(processed)
+    dump(site_templates, 'template-spells.json')
 
 
 if __name__ == '__main__':

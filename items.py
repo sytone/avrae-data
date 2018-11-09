@@ -82,7 +82,7 @@ def prerender(data):
     return data
 
 
-def metarender(data):
+def site_render(data):
     out = []
     for item in data:
         if not item['srd']:
@@ -163,7 +163,7 @@ def run():
     data.extend(objects)
     data = srdfilter(data)
     data = prerender(data)
-    sitedata = metarender(data)
+    sitedata = site_render(data)
     dump(data)
     dump(sitedata, 'template-items.json')
 
