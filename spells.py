@@ -359,8 +359,24 @@ def site_parse(data):
             continue
         spell['classes'] = ', '.join(spell['classes'])
         spell['subclasses'] = ', '.join(spell['subclasses'])
+        spell['components'] = site_parse_components(spell['components'])
+        if spell['duration'].startswith("Concentration, up to "):
+            spell['duration'] = spell['duration'][len("Concentration, up to "):]
         del spell['srd'], spell['source'], spell['page']
         out.append(spell)
+    return out
+
+
+def site_parse_components(components):
+    out = {"verbal": False, "somatic": False, "material": ""}
+    components = components.split(", ")
+    if 'V' in components:
+        out['verbal'] = True
+    if 'S' in components:
+        out['somatic'] = True
+    m = next((c for c in components if c.startswith('M')), None)
+    if m:
+        out['material'] = m[3:-1]
     return out
 
 
