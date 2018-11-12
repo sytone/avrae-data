@@ -23,15 +23,15 @@ def render(text, md_breaks=False, join_char='\n'):
         if not isinstance(entry, dict):
             out.append(str(entry))
         elif isinstance(entry, dict):
-            if not 'type' in entry and 'title' in entry:
+            if 'type' not in entry and 'title' in entry:
                 out.append(f"**{entry['title']}**: {render(entry['text'])}")
-            elif not 'type' in entry and 'istable' in entry:  # only for races
+            elif 'type' not in entry and 'istable' in entry:  # only for races
                 temp = f"**{entry['caption']}**\n" if 'caption' in entry else ''
                 temp += ' - '.join(f"**{parse_data_formatting(cl)}**" for cl in entry['thead']) + '\n'
                 for row in entry['tbody']:
                     temp += ' - '.join(f"{parse_data_formatting(col)}" for col in row) + '\n'
                 out.append(temp.strip())
-            elif entry['type'] == 'entries':
+            elif entry['type'] in ('entries', 'inset'):
                 out.append((f"**{entry['name']}**: " if 'name' in entry else '') + render(
                     entry['entries']))  # oh gods here we goooooooo
             elif entry['type'] == 'options':
@@ -101,7 +101,7 @@ PARSING = {'hit': lambda e: f"{int(e):+}",
            'scaledice': lambda e: e.split('|')[-1],
            'book': lambda e: e.split('|')[0],
            'h': lambda e: "Hit: "}
-IGNORED = ['dice', 'condition', 'skill', 'action', 'creature', 'item', 'spell', 'damage', 'race']
+DEAFULT = ['dice', 'condition', 'skill', 'action', 'creature', 'item', 'spell', 'damage', 'race', 'background']
 
 
 def parse_data_formatting(text):
@@ -110,7 +110,7 @@ def parse_data_formatting(text):
 
     def sub(match):
         log.debug(f"Rendering {match.group(0)}...")
-        if match.group(1) in IGNORED:
+        if match.group(1) in DEAFULT:
             out = SRC_FORMAT(match.group(2))
         elif match.group(1) in PARSING:
             f = PARSING.get(match.group(1), lambda e: e)
