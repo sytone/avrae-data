@@ -1,7 +1,6 @@
-import json
 import logging
 
-from utils import get_data
+from utils import get_data, dump
 
 log = logging.getLogger("feats")
 
@@ -19,15 +18,10 @@ def srdfilter(data):
     return data
 
 
-def dump(data):
-    with open('out/feats.json', 'w') as f:
-        json.dump(data, f, indent=4)
-
-
 def run():
     data = get_latest_feats()
     data = srdfilter(data)
-    dump(data)
+    dump(data, 'feats.json')
 
 
 if __name__ == '__main__':

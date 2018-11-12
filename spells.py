@@ -4,11 +4,12 @@ import sys
 
 import requests
 
-from utils import get_json, render, recursive_tag
+from utils import get_json, render, recursive_tag, dump
 
 NEW_AUTOMATION = "oldauto" not in sys.argv
 VERB_TRANSFORM = {'dispel': 'dispelled', 'discharge': 'discharged'}
 SPELL_AUTOMATION_SRC = "https://raw.githubusercontent.com/avrae/avrae-spells/master/spells.json"
+IGNORED_FILES = ('3pp', 'stream')
 
 log = logging.getLogger("spells")
 
@@ -31,7 +32,8 @@ def get_spells():
         index = get_json('spells/index.json')
         spells = []
         for src, file in index.items():
-            if '3pp' in src:
+            if any(ig in file for ig in IGNORED_FILES):
+                log.info(f"Skipping file {file}")
                 continue
             data = get_json(f"spells/{file}")
             spells.extend(data['spell'])
@@ -331,18 +333,13 @@ def parse(data):
             "ritual": ritual,
             "higherlevels": higherlevels,
             "source": spell['source'],
-            "page": spell['page'],
+            "page": spell.get('page', '?'),
             "concentration": spell['concentration'],
             "automation": automation,
             "srd": spell['srd']
         }
         processed.append(recursive_tag(newspell))
     return processed
-
-
-def dump(data, filename='spells.json'):
-    with open(f'out/{filename}', 'w') as f:
-        json.dump(data, f, indent=2)
 
 
 def get_auto_only(data):
@@ -383,7 +380,7 @@ def site_parse_components(components):
 def run():
     data = get_spells()
     processed = parse(data)
-    dump(processed)
+    dump(processed, 'spells.json')
     dump(get_auto_only(processed), 'spellauto.json')
 
     site_templates = site_parse(processed)

@@ -1,7 +1,6 @@
-import json
 import logging
 
-from utils import get_data, render, recursive_tag
+from utils import get_data, render, recursive_tag, dump
 
 log = logging.getLogger("items")
 
@@ -149,11 +148,6 @@ def site_render(data):
     return out
 
 
-def dump(data, filename='items.json'):
-    with open(f'out/{filename}', 'w') as f:
-        json.dump(data, f, indent=4)
-
-
 def run():
     data = get_latest_items()
     data = moneyfilter(data)
@@ -164,7 +158,7 @@ def run():
     data = srdfilter(data)
     data = prerender(data)
     sitedata = site_render(data)
-    dump(data)
+    dump(data, 'items.json')
     dump(sitedata, 'template-items.json')
 
 

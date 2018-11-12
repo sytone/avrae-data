@@ -180,11 +180,6 @@ def parse_attacks(data):
     return data
 
 
-def dump(data):
-    with open('out/bestiary.json', 'w') as f:
-        json.dump(data, f, indent=4)
-
-
 def run():
     data = get_bestiaries_from_web()
     data = srdfilter(data)
@@ -192,7 +187,7 @@ def run():
     rendered = monster_render(data)
     rendered = recursive_tag(rendered)
     out = parse_attacks(rendered)
-    dump(out)
+    dump(out, 'bestiary.json')
 
 
 if __name__ == '__main__':

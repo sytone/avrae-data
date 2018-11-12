@@ -2,7 +2,7 @@ import copy
 import json
 import logging
 
-from utils import get_json
+from utils import get_json, dump
 
 SRD = ['Dragonborn', 'Half-Elf', 'Half-Orc', 'Elf (High)', 'Dwarf (Hill)', 'Human', 'Human (Variant)',
        'Halfling (Lightfoot)', 'Gnome (Rock)', 'Tiefling']
@@ -85,18 +85,13 @@ def srdfilter(data):
     return data
 
 
-def dump(data):
-    with open('out/races.json', 'w') as f:
-        json.dump(data, f, indent=4)
-
-
 def run():
     data = get_races_from_web()
     data = split_subraces(data)
     data = explicit_sources(data)
     data = fix_dupes(data)
     data = srdfilter(data)
-    dump(data)
+    dump(data, 'races.json')
 
 
 if __name__ == '__main__':

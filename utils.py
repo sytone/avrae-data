@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import re
 import sys
 
@@ -32,6 +33,15 @@ def get_data(path):
         with open(f'cache/{path}', 'w') as f:
             json.dump(dat, f, indent=2)
     return dat
+
+
+def dump(data, filename):
+    try:
+        os.rename(f'out/{filename}', f'out/old_{filename}')
+    except FileNotFoundError:
+        pass
+    with open(f'out/{filename}', 'w') as f:
+        json.dump(data, f, indent=2)
 
 
 def nth_repl(s, sub, repl, nth):
