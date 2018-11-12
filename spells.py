@@ -4,7 +4,8 @@ import sys
 
 import requests
 
-from utils import get_json, render, recursive_tag, dump
+from lib.parsing import render, recursive_tag
+from lib.utils import get_json, dump
 
 NEW_AUTOMATION = "oldauto" not in sys.argv
 VERB_TRANSFORM = {'dispel': 'dispelled', 'discharge': 'discharged'}

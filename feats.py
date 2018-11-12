@@ -1,6 +1,6 @@
 import logging
 
-from utils import get_data, dump
+from lib.utils import get_data, dump
 
 log = logging.getLogger("feats")
 

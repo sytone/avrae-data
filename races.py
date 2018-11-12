@@ -2,12 +2,13 @@ import copy
 import json
 import logging
 
-from utils import get_json, dump
+from lib.utils import get_json, dump, fix_dupes, remove_ignored, explicit_sources
 
-SRD = ['Dragonborn', 'Half-Elf', 'Half-Orc', 'Elf (High)', 'Dwarf (Hill)', 'Human', 'Human (Variant)',
-       'Halfling (Lightfoot)', 'Gnome (Rock)', 'Tiefling']
-SOURCE_HIERARCHY = ['MTF', 'VGM', 'PHB', 'DMG', 'UAWGtE', 'UA', 'nil']
-EXPLICIT_SOURCES = ['UAEberron', 'DMG']
+SRD = ('Dragonborn', 'Half-Elf', 'Half-Orc', 'Elf (High)', 'Dwarf (Hill)', 'Human', 'Human (Variant)',
+       'Halfling (Lightfoot)', 'Gnome (Rock)', 'Tiefling')
+SOURCE_HIERARCHY = ('MTF', 'VGM', 'PHB', 'DMG', 'GGR', 'UAWGtE', 'UA', 'nil')
+IGNORED_SOURCES = ('UARacesOfRavnica', 'UACentaursMinotaurs', 'UAEladrinAndGith', 'UAFiendishOptions')
+EXPLICIT_SOURCES = ('UAEberron', 'DMG')
 
 log = logging.getLogger("races")
 
@@ -53,29 +54,6 @@ def split_subraces(races):
     return out
 
 
-def explicit_sources(data):
-    for r in data:
-        if r['source'] in EXPLICIT_SOURCES:
-            new_name = f"{r['name']} ({r['source']})"
-            log.info(f"Renaming {r['name']} to {new_name} (explicit override)")
-            r['name'] = new_name
-    return data
-
-
-def fix_dupes(data):
-    for race in data:
-        if len([r for r in data if r['name'] == race['name']]) > 1:
-            log.warning(f"Found duplicate: {race['name']}")
-            hierarchied = sorted([r for r in data if r['name'] == race['name']],
-                                 key=lambda r: SOURCE_HIERARCHY.index(
-                                     next((s for s in SOURCE_HIERARCHY if s in r['source']), 'nil')))
-            for r in hierarchied[1:]:
-                new_name = f"{r['name']} ({r['source']})"
-                log.info(f"Renaming {r['name']} to {new_name}")
-                r['name'] = new_name
-    return data
-
-
 def srdfilter(data):
     for race in data:
         if race['name'] in SRD:
@@ -88,8 +66,9 @@ def srdfilter(data):
 def run():
     data = get_races_from_web()
     data = split_subraces(data)
-    data = explicit_sources(data)
-    data = fix_dupes(data)
+    data = explicit_sources(data, EXPLICIT_SOURCES)
+    data = fix_dupes(data, SOURCE_HIERARCHY)
+    data = remove_ignored(data, IGNORED_SOURCES)
     data = srdfilter(data)
     dump(data, 'races.json')
 

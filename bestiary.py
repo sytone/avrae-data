@@ -1,4 +1,7 @@
-from utils import *
+import re
+
+from lib.parsing import render, recursive_tag
+from lib.utils import *
 
 ATTACK_RE = re.compile(r'(?:<i>)?(?:\w+ ){1,4}Attack:(?:</i>)? ([+-]?\d+) to hit, .*?(?:<i>)?'
                        r'Hit:(?:</i>)? (?:(?:[+-]?\d+ \((.+?)\))|(?:([+-]?\d+))) (\w+) damage[., ]??'
@@ -26,6 +29,37 @@ def get_bestiaries_from_web():
         with open('cache/monster.json', 'w') as f:
             json.dump(monsters, f, indent=2)
     return monsters
+
+
+def parse_copies(data):
+    for i, monster in enumerate(data):
+        if '_copy' not in monster:
+            continue
+        original = monster.copy()  # how ironic
+        del original['_copy']
+
+        copymeta = monster['_copy']
+        log.info(f"Copying {copymeta['name']} onto {monster['name']}...")
+        to_copy = next(m for m in data if m['source'] == copymeta['source'] and m['name'] == copymeta['name'])
+
+        # I hate this so much
+        data_str = json.dumps(to_copy)
+        for replacer in copymeta.get('replacers', []):
+            data_str = data_str.replace(replacer['replace'], replacer['with'])
+        copied = json.loads(data_str)
+
+        for key, mod in copymeta.get('arrayModifiers', {}).items():
+            if mod['mode'] == 'prepend':
+                copied[key] = mod['data'] + copied[key]
+            elif mod['mode'] == 'append':
+                copied[key].extend(mod['data'])
+            else:
+                log.warning(f"Unknown copymeta mode: {mod['mode']}!")
+
+        copied.update(original)
+        data[i] = copied
+    return data
+
 
 
 def srdfilter(data):
@@ -182,6 +216,7 @@ def parse_attacks(data):
 
 def run():
     data = get_bestiaries_from_web()
+    data = parse_copies(data)
     data = srdfilter(data)
     data = parse_ac(data)
     rendered = monster_render(data)

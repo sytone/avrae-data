@@ -1,6 +1,7 @@
 import logging
 
-from utils import get_data, render, recursive_tag, dump
+from lib.parsing import render, recursive_tag
+from lib.utils import get_data, dump
 
 log = logging.getLogger("items")
 
