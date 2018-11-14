@@ -1,8 +1,7 @@
 import copy
-import json
 import logging
 
-from lib.utils import get_json, dump, fix_dupes, remove_ignored, explicit_sources
+from lib.utils import dump, fix_dupes, remove_ignored, explicit_sources, get_data
 
 SRD = ('Dragonborn', 'Half-Elf', 'Half-Orc', 'Elf (High)', 'Dwarf (Hill)', 'Human', 'Human (Variant)',
        'Halfling (Lightfoot)', 'Gnome (Rock)', 'Tiefling')
@@ -14,15 +13,7 @@ log = logging.getLogger("races")
 
 
 def get_races_from_web():
-    try:
-        with open('cache/races.json') as f:
-            races = json.load(f)
-            log.info("Loaded race data from cache")
-    except FileNotFoundError:
-        races = get_json('races.json')['race']
-        with open('cache/races.json', 'w') as f:
-            json.dump(races, f, indent=2)
-    return races
+    return get_data('races.json')['race']
 
 
 def split_subraces(races):

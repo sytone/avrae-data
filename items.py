@@ -23,8 +23,9 @@ PROPS = {"A": "ammunition", "LD": "loading", "L": "light", "F": "finesse", "T": 
 
 
 def get_latest_items():
-    return get_data("items.json")['item'] + get_data("basicitems.json")['basicitem'] + get_data("magicvariants.json")[
-        'variant']
+    return get_data("items.json")['item'] + \
+           get_data("basicitems.json")['basicitem'] + \
+           get_data("magicvariants.json")['variant']
 
 
 def moneyfilter(data):

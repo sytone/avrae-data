@@ -13,22 +13,7 @@ log = logging.getLogger("bestiary")
 
 
 def get_bestiaries_from_web():
-    try:
-        with open('cache/monster.json') as f:
-            monsters = json.load(f)
-            log.info("Loaded monster data from cache")
-    except FileNotFoundError:
-        index = get_json('bestiary/index.json')
-        monsters = []
-        for src, file in index.items():
-            if '3pp' in src:
-                continue
-            data = get_json(f"bestiary/{file}")
-            monsters.extend(data['monster'])
-            log.info(f"  Processed {file}: {len(data['monster'])} monsters")
-        with open('cache/monster.json', 'w') as f:
-            json.dump(monsters, f, indent=2)
-    return monsters
+    return get_indexed_data('bestiary/', 'monster.json', 'monster')
 
 
 def parse_copies(data):

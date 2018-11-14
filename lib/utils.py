@@ -25,14 +25,40 @@ def get_json(path):
 
 def get_data(path):
     try:
-        with open(f'cache/{path}') as f:
-            dat = json.load(f)
-            log.info(f"Loaded {path} from cache")
+        if "nocache" not in sys.argv:
+            with open(f'cache/{path}') as f:
+                dat = json.load(f)
+                log.info(f"Loaded {path} from cache")
+        else:
+            raise FileNotFoundError  # I mean.
     except FileNotFoundError:
         dat = get_json(path)
         with open(f'cache/{path}', 'w') as f:
             json.dump(dat, f, indent=2)
     return dat
+
+
+def get_indexed_data(root, cache_name, root_key):
+    try:
+        if "nocache" not in sys.argv:
+            with open(f'cache/{cache_name}') as f:
+                cached = json.load(f)
+                log.info(f"Loaded {cache_name} data from cache")
+                return cached
+        else:
+            raise FileNotFoundError
+    except FileNotFoundError:
+        index = get_json(f'{root}index.json')
+        out = []
+        for src, file in index.items():
+            if '3pp' in src:
+                continue
+            data = get_json(f"{root}{file}")
+            out.extend(data[root_key])
+            log.info(f"  Processed {file}: {len(data[root_key])} entries")
+        with open(f'cache/{cache_name}', 'w') as f:
+            json.dump(out, f, indent=2)
+        return out
 
 
 def dump(data, filename):
@@ -68,17 +94,21 @@ def explicit_sources(data, sources):
     return data
 
 
-def fix_dupes(data, source_hierarchy):
-    for entry in data:
+def fix_dupes(data, source_hierarchy, remove_dupes=False):
+    for entry in data.copy():
         if len([r for r in data if r['name'] == entry['name']]) > 1:
             log.warning(f"Found duplicate: {entry['name']}")
             hierarchied = sorted([r for r in data if r['name'] == entry['name']],
                                  key=lambda r: source_hierarchy.index(
                                      next((s for s in source_hierarchy if s in r['source']), 'nil')))
             for r in hierarchied[1:]:
-                new_name = f"{r['name']} ({r['source']})"
-                log.info(f"Renaming {r['name']} to {new_name}")
-                r['name'] = new_name
+                if not remove_dupes:
+                    new_name = f"{r['name']} ({r['source']})"
+                    log.info(f"Renaming {r['name']} to {new_name}")
+                    r['name'] = new_name
+                else:
+                    log.info(f"Removing {r['name']} ({r['source']})")
+                    data.remove(r)
     return data
 
 

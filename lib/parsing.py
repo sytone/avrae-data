@@ -101,7 +101,8 @@ PARSING = {'hit': lambda e: f"{int(e):+}",
            'scaledice': lambda e: e.split('|')[-1],
            'book': lambda e: e.split('|')[0],
            'h': lambda e: "Hit: "}
-DEAFULT = ['dice', 'condition', 'skill', 'action', 'creature', 'item', 'spell', 'damage', 'race', 'background']
+DEFAULT = ['dice', 'condition', 'skill', 'action', 'creature', 'item', 'spell', 'damage', 'race', 'background',
+           '5etools']
 
 
 def parse_data_formatting(text):
@@ -110,7 +111,7 @@ def parse_data_formatting(text):
 
     def sub(match):
         log.debug(f"Rendering {match.group(0)}...")
-        if match.group(1) in DEAFULT:
+        if match.group(1) in DEFAULT:
             out = SRC_FORMAT(match.group(2))
         elif match.group(1) in PARSING:
             f = PARSING.get(match.group(1), lambda e: e)
