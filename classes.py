@@ -1,7 +1,7 @@
 import logging
 
 from lib.parsing import recursive_tag, render
-from lib.utils import dump, get_indexed_data, remove_ignored
+from lib.utils import dump, get_indexed_data, remove_ignored, get_data
 
 SRD = ('Barbarian', 'Bard', 'Cleric', 'Druid', 'Fighter', 'Monk', 'Paladin', 'Ranger', 'Rogue', 'Sorcerer', 'Warlock',
        'Wizard')
@@ -136,12 +136,44 @@ def _resolve_name(entry):
         log.warning(f"No name found for {entry}")
 
 
+def parse_invocations():
+    out = []
+    optfeats = get_data('optionalfeatures.json')['optionalfeature']
+    invocs = [i for i in optfeats if i['featureType'] == 'EI']
+
+    for invoc in invocs:
+        log.info(f"Parsing invocation {invoc['name']}")
+        text = render(invoc['entries'])
+        if 'prerequisite' in invoc:
+            prereqs = []
+            for prereq in invoc['prerequisite']:
+                if prereq['type'] == 'prereqPact':
+                    prereqs.append(f"Pact of the {prereq['entry']}")
+                elif prereq['type'] == 'prereqPatron':
+                    prereqs.append(f"Patron: {prereq['entry']}")
+                elif prereq['type'] == 'prereqLevel':
+                    prereqs.append(f"Level {prereq['level']}")
+                elif prereq['type'] == 'prereqSpell':
+                    prereqs.append(f"*{', '.join(prereq['entries'])}* spell")
+                else:
+                    log.warning(f"Unknown prereq type: {prereq['type']}")
+            text = f"*Prerequisite: {', '.join(prereqs)}*\n{text}"
+        inv = {
+            'name': f"Warlock: Eldritch Invocation: {invoc['name']}",
+            'text': text,
+            'srd': invoc['source'] == 'PHB'
+        }
+        out.append(inv)
+    return out
+
+
 def run():
     data = get_classes_from_web()
     data = filter_ignored(data)
     data = srdfilter(data)
     data = recursive_tag(data)
     classfeats = parse_classfeats(data)
+    classfeats.extend(parse_invocations())
     dump(data, 'classes.json')
     dump(classfeats, 'classfeats.json')
 
