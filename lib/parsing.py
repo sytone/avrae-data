@@ -31,7 +31,7 @@ def render(text, md_breaks=False, join_char='\n'):
                 for row in entry['tbody']:
                     temp += ' - '.join(f"{parse_data_formatting(col)}" for col in row) + '\n'
                 out.append(temp.strip())
-            elif entry['type'] in ('entries', 'inset'):
+            elif 'type' not in entry or entry['type'] in ('entries', 'inset'):
                 out.append((f"**{entry['name']}**: " if 'name' in entry else '') + render(
                     entry['entries']))  # oh gods here we goooooooo
             elif entry['type'] == 'options':
