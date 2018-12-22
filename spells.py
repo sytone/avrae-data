@@ -296,6 +296,31 @@ def spell_context(spell):
     return context
 
 
+def ensure_ml_order(spells):
+    log.info("Attempting to put spells in ML order...")
+    try:
+        with open('in/map-spell.json') as f:
+            spell_map_dict = json.load(f)
+    except FileNotFoundError:
+        log.warning(f"ML spell map not found. Spell order may not match ML outputs.")
+        return spells
+    spell_map = sorted(((int(i), name) for i, name in spell_map_dict.items()), key=lambda i: i[0])
+    spell_map = [s[1] for s in spell_map]  # index holds position, since one-hot
+
+    # sort spells in map first, then map position, then name
+    def spellsort(s):
+        try:
+            ml_index = spell_map.index(s['name'])
+        except ValueError:
+            ml_index = -1
+        return s['name'] not in spell_map, ml_index, s['name']
+
+    spells = sorted(spells, key=spellsort)
+    if len(spells) != len(spell_map):
+        log.warning(f"Number of spells differs from spell map length. Delta: {len(spells) - len(spell_map)}")
+    return spells
+
+
 def parse(data):
     processed = []
     for spell in data:
@@ -340,6 +365,8 @@ def parse(data):
             "srd": spell['srd']
         }
         processed.append(recursive_tag(newspell))
+
+    processed = ensure_ml_order(processed)
     return processed
 
 
