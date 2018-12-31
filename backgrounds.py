@@ -5,7 +5,7 @@ from lib.utils import get_data, dump
 
 log = logging.getLogger("backgrounds")
 
-SRD = ['Acolyte', 'Criminal', 'Folk Hero', 'Noble', 'Sage', 'Soldier']
+SRD = ['Acolyte']
 PROF_KEYS = ("skillProficiencies", "languageProficiencies", "toolProficiencies")
 
 
