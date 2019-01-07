@@ -1,7 +1,7 @@
 import logging
 
 from lib.parsing import render, recursive_tag
-from lib.utils import get_data, dump
+from lib.utils import get_data, dump, diff
 
 log = logging.getLogger("items")
 
@@ -77,6 +77,10 @@ def prerender(data):
             del item['entries']
         else:
             item['desc'] = ""
+
+        if 'additionalEntries' in item:
+            item['desc'] += f"\n\n{render(item['additionalEntries'])}"
+        item['desc'] = item['desc'].strip()
 
         for k, v in item.items():
             item[k] = recursive_tag(v)
@@ -161,6 +165,7 @@ def run():
     data = prerender(data)
     sitedata = site_render(data)
     dump(data, 'items.json')
+    diff('items.json')
     dump(sitedata, 'template-items.json')
 
 

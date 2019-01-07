@@ -1,3 +1,4 @@
+import difflib
 import json
 import logging
 import os
@@ -63,11 +64,22 @@ def get_indexed_data(root, cache_name, root_key):
 
 def dump(data, filename):
     try:
-        os.rename(f'out/{filename}', f'bak/{int(time.time())}-{filename}')
+        os.rename(f'out/{filename}', f'bak/{filename}.old')
     except FileNotFoundError:
         pass
     with open(f'out/{filename}', 'w') as f:
         json.dump(data, f, indent=2)
+
+
+def diff(filename):
+    try:
+        with open(f'bak/{filename}.old') as before:
+            old = before.readlines()
+        with open(f'out/{filename}') as after:
+            new = after.readlines()
+    except FileNotFoundError:
+        return
+    sys.stdout.writelines(difflib.unified_diff(old, new, fromfile=f"bak/{filename}.old", tofile=f"out/{filename}"))
 
 
 def nth_repl(s, sub, repl, nth):
