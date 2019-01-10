@@ -5,7 +5,7 @@ import sys
 import requests
 
 from lib.parsing import render, recursive_tag
-from lib.utils import get_json, dump
+from lib.utils import get_json, dump, diff
 
 NEW_AUTOMATION = "oldauto" not in sys.argv
 VERB_TRANSFORM = {'dispel': 'dispelled', 'discharge': 'discharged'}
@@ -135,8 +135,8 @@ def parseclasses(spell):
         subclasses.append(f"{subclass['class']['name']} ({subclass['subclass']['name']})")
     classes = list(set(classes))
     subclasses = list(set(subclasses))
-    spell['classes'] = classes
-    spell['subclasses'] = subclasses
+    spell['classes'] = sorted(classes)
+    spell['subclasses'] = sorted(subclasses)
     log.debug(f"{spell['name']} classes: {classes}")
     log.debug(f"{spell['name']} subclasses: {subclasses}")
 
@@ -409,6 +409,7 @@ def run():
     data = get_spells()
     processed = parse(data)
     dump(processed, 'spells.json')
+    diff('spells.json')
     dump(get_auto_only(processed), 'spellauto.json')
 
     site_templates = site_parse(processed)
