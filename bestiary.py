@@ -34,12 +34,33 @@ def parse_copies(data):
         copied = json.loads(data_str)
 
         for key, mod in copymeta.get('arrayModifiers', {}).items():
-            if mod['mode'] == 'prepend':
-                copied[key] = mod['data'] + copied[key]
-            elif mod['mode'] == 'append':
-                copied[key].extend(mod['data'])
-            else:
-                log.warning(f"Unknown copymeta mode: {mod['mode']}!")
+            for action in mod:
+                if action['mode'] == 'replace':
+                    for entry in action['data']:
+                        to_replace = next(e for e in copied[key] if e['name'] == entry['replace'])
+                        entry.pop('replace')
+                        to_replace.update(entry)
+                elif action['mode'] == 'remove':
+                    if 'data' not in action:
+                        try:
+                            del copied[key]
+                        except KeyError:
+                            log.warning(f"I tried to delete key {key} but it does not exist")
+                            continue
+                    else:
+                        for to_remove in action['data']:
+                            try:
+                                copied[key].remove(next(e for e in copied[key] if e['name'] == to_remove['remove']))
+                            except StopIteration:
+                                log.warning(f"I tried to remove {key}.{to_remove['remove']} but it does not exist")
+                                continue
+                elif action['mode'] == 'prepend':
+                    for entry in reversed(action['data']):
+                        copied[key].insert(0, entry)
+                elif action['mode'] == 'append':
+                    copied[key].extend(action['data'])
+                else:
+                    log.warning(f"Unknown copy action: {action['mode']}")
 
         copied.update(original)
         data[i] = copied
