@@ -93,6 +93,54 @@ def parse_ac(data):
     return data
 
 
+def parse_spellcasting(monster):
+    if 'trait' not in monster:
+        monster['trait'] = []
+    known_spells = []
+    usual_dc = (0, 0)  # dc, number of spells using dc
+    usual_sab = (0, 0)  # same thing
+    caster_level = 1
+    for cast_type in monster['spellcasting']:
+        trait = {'name': cast_type['name'], 'text': render(cast_type['headerEntries'])}
+        type_dc = re.search(r'\(spell save DC (\d+)', '\n'.join(cast_type['headerEntries']))
+        type_sab = re.search(r'{@hit (\d+)}', '\n'.join(cast_type['headerEntries']))
+        type_caster_level = re.search(r'(\d+)[stndrh]{2}-level', '\n'.join(cast_type['headerEntries']))
+        type_spells = []
+        if 'will' in cast_type:
+            type_spells.extend(extract_spell(s) for s in cast_type['will'])
+            spells = render(', '.join(cast_type['will']))
+            trait['text'] += f"\nAt will: {spells}"
+        if 'daily' in cast_type:
+            for times_per_day, spells in cast_type['daily'].items():
+                each = ' each' if times_per_day.endswith('e') else ''
+                times_per_day = times_per_day.rstrip('e')
+                type_spells.extend(extract_spell(s) for s in spells)
+                spells = render(', '.join(spells))
+                trait['text'] += f"\n{times_per_day}/day{each}: {spells}"
+        if 'spells' in cast_type:
+            for level, level_data in cast_type['spells'].items():
+                spells = level_data['spells']
+                level_text = get_spell_level(level)
+                slots = f"{level_data.get('slots', 'unknown')} slots" if level != '0' else "at will"
+                type_spells.extend(extract_spell(s) for s in spells)
+                spells = render(', '.join(spells))
+                trait['text'] += f"\n{level_text} ({slots}): {spells}"
+        trait['text'] = render(trait['text'])
+        monster['trait'].append(trait)
+        known_spells.extend(type_spells)
+        if type_dc and len(type_spells) > usual_dc[1]:
+            usual_dc = (int(type_dc.group(1)), len(type_spells))
+        if type_sab and len(type_spells) > usual_sab[1]:
+            usual_sab = (int(type_sab.group(1)), len(type_spells))
+        if type_caster_level:
+            caster_level = int(type_caster_level.group(1))
+    dc = usual_dc[0]
+    sab = usual_sab[0]
+    monster['spellcasting'] = {'spells': known_spells, 'dc': dc, 'attackBonus': sab,
+                               'casterLevel': caster_level}  # overwrite old
+    log.info(f"Lvl {caster_level}; DC: {dc}; SAB: {sab}; Spells: {known_spells}")
+
+
 def monster_render(data):
     for monster in data:
         log.info(f"Rendering {monster['name']}")
@@ -106,51 +154,7 @@ def monster_render(data):
                 monster[t] = temp
 
         if 'spellcasting' in monster:
-            if 'trait' not in monster:
-                monster['trait'] = []
-            known_spells = []
-            usual_dc = (0, 0)  # dc, number of spells using dc
-            usual_sab = (0, 0)  # same thing
-            caster_level = 1
-            for cast_type in monster['spellcasting']:
-                trait = {'name': cast_type['name'], 'text': render(cast_type['headerEntries'])}
-                type_dc = re.search(r'\(spell save DC (\d+)', '\n'.join(cast_type['headerEntries']))
-                type_sab = re.search(r'{@hit (\d+)}', '\n'.join(cast_type['headerEntries']))
-                type_caster_level = re.search(r'(\d+)[stndrh]{2}-level', '\n'.join(cast_type['headerEntries']))
-                type_spells = []
-                if 'will' in cast_type:
-                    type_spells.extend(extract_spell(s) for s in cast_type['will'])
-                    spells = render(', '.join(cast_type['will']))
-                    trait['text'] += f"\nAt will: {spells}"
-                if 'daily' in cast_type:
-                    for times_per_day, spells in cast_type['daily'].items():
-                        each = ' each' if times_per_day.endswith('e') else ''
-                        times_per_day = times_per_day.rstrip('e')
-                        type_spells.extend(extract_spell(s) for s in spells)
-                        spells = render(', '.join(spells))
-                        trait['text'] += f"\n{times_per_day}/day{each}: {spells}"
-                if 'spells' in cast_type:
-                    for level, level_data in cast_type['spells'].items():
-                        spells = level_data['spells']
-                        level_text = get_spell_level(level)
-                        slots = f"{level_data.get('slots', 'unknown')} slots" if level != '0' else "at will"
-                        type_spells.extend(extract_spell(s) for s in spells)
-                        spells = render(', '.join(spells))
-                        trait['text'] += f"\n{level_text} ({slots}): {spells}"
-                trait['text'] = render(trait['text'])
-                monster['trait'].append(trait)
-                known_spells.extend(type_spells)
-                if type_dc and len(type_spells) > usual_dc[1]:
-                    usual_dc = (int(type_dc.group(1)), len(type_spells))
-                if type_sab and len(type_spells) > usual_sab[1]:
-                    usual_sab = (int(type_sab.group(1)), len(type_spells))
-                if type_caster_level:
-                    caster_level = int(type_caster_level.group(1))
-            dc = usual_dc[0]
-            sab = usual_sab[0]
-            monster['spellcasting'] = {'spells': known_spells, 'dc': dc, 'attackBonus': sab,
-                                       'casterLevel': caster_level}  # overwrite old
-            log.info(f"Lvl {caster_level}; DC: {dc}; SAB: {sab}; Spells: {known_spells}")
+            parse_spellcasting(monster)
     return data
 
 
