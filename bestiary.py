@@ -46,7 +46,6 @@ def parse_copies(data):
     return data
 
 
-
 def srdfilter(data):
     with open('srd/srd-monsters.txt') as f:
         srd = [s.strip().lower() for s in f.read().split('\n')]
@@ -194,6 +193,9 @@ def parse_attacks(data):
                             atk = {'name': name, 'attackBonus': None, 'damage': damage, 'details': raw}
                             attacks.append(atk)
                             index += 1
+
+        for attack in attacks:
+            attack['name'] = re.sub(r"(.+)\(.+\)", r"\1", attack['name']).strip()
         monster['attacks'] = attacks
         log.debug(f"Parsed attacks for {monster['name']}: {attacks}")
     return data
@@ -208,6 +210,7 @@ def run():
     rendered = recursive_tag(rendered)
     out = parse_attacks(rendered)
     dump(out, 'bestiary.json')
+    diff('bestiary.json')
 
 
 if __name__ == '__main__':
