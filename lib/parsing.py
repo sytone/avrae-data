@@ -85,7 +85,7 @@ def render(text, md_breaks=False, join_char='\n'):
 
 
 def SRC_FORMAT(e):
-    return e.split('|')[0] if len(e.split('|')) < 3 else e.split('|')[-1]
+    return e.split('|')[0] if len(e.split('|')) < 3 else e.split('|')[2]
 
 
 ATK_TYPES = {'mw': "Melee Weapon", 'rw': "Ranged Weapon", 'mw,rw': "Melee or Ranged Weapon",
@@ -102,7 +102,7 @@ PARSING = {'hit': lambda e: f"{int(e):+}",
            'book': lambda e: e.split('|')[0],
            'h': lambda e: "Hit: "}
 DEFAULT = ['dice', 'condition', 'skill', 'action', 'creature', 'item', 'spell', 'damage', 'race', 'background',
-           '5etools']
+           '5etools', 'class']
 
 
 def parse_data_formatting(text):
