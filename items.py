@@ -1,4 +1,5 @@
 import logging
+import re
 
 from lib.parsing import render, recursive_tag
 from lib.utils import get_data, dump, diff
@@ -32,9 +33,21 @@ def moneyfilter(data):
     return [i for i in data if not i.get('type') == "$"]
 
 
+def render_variant_eqs(entries, inherits):
+    for i, entry in enumerate(entries):
+        if isinstance(entry, str):
+            entries[i] = re.sub(r"{=(\w+)}", lambda m: inherits.get(m.group(1), m.group(0)), entry)
+        else:
+            entries[i] = render(entry)
+    return entries
+
+
 def variant_inheritance(data):
     for item in data:
+        log.debug(item['name'])
         if item.get('type') == 'GV':
+            if 'entries' in item['inherits']:
+                item['inherits']['entries'] = render_variant_eqs(item['inherits']['entries'], item['inherits'])
             if 'entries' in item:
                 oldentries = item['entries'].copy()
                 item.update(item['inherits'])
