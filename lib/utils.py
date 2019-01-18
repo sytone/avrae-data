@@ -3,12 +3,11 @@ import json
 import logging
 import os
 import sys
-import time
 
 import requests
 
 DATA_SRC = "https://5etools.com/data/"
-LOGLEVEL = logging.INFO if not "debug" in sys.argv else logging.DEBUG
+LOGLEVEL = logging.INFO if "debug" not in sys.argv else logging.DEBUG
 
 log_formatter = logging.Formatter('%(levelname)s:%(name)s: %(message)s')
 handler = logging.StreamHandler(sys.stdout)
@@ -130,3 +129,13 @@ def remove_ignored(data, ignored_sources):
             data.remove(entry)
             log.info(f"{entry['name']} ({entry['source']}) ignored, removing!")
     return data
+
+
+def english_join(l):
+    l = list(l)
+    if len(l) < 2:
+        return l[0]
+    elif len(l) == 2:
+        return ' or '.join(l)
+    else:
+        return ', '.join(l[:-1]) + f', or {l[-1]}'
