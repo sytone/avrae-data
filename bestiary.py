@@ -103,7 +103,7 @@ def parse_spellcasting(monster):
     for cast_type in monster['spellcasting']:
         trait = {'name': cast_type['name'], 'text': render(cast_type['headerEntries'])}
         type_dc = re.search(r'\(spell save DC (\d+)', '\n'.join(cast_type['headerEntries']))
-        type_sab = re.search(r'{@hit (\d+)}', '\n'.join(cast_type['headerEntries']))
+        type_sab = re.search(r'{@?hit (\d+)}', '\n'.join(cast_type['headerEntries']))
         type_caster_level = re.search(r'(\d+)[stndrh]{2}-level', '\n'.join(cast_type['headerEntries']))
         type_spells = []
         if 'will' in cast_type:
@@ -128,9 +128,9 @@ def parse_spellcasting(monster):
         trait['text'] = render(trait['text'])
         monster['trait'].append(trait)
         known_spells.extend(type_spells)
-        if type_dc and len(type_spells) > usual_dc[1]:
+        if type_dc and (len(type_spells) > usual_dc[1] or not usual_dc[0]):
             usual_dc = (int(type_dc.group(1)), len(type_spells))
-        if type_sab and len(type_spells) > usual_sab[1]:
+        if type_sab and (len(type_spells) > usual_sab[1] or not usual_sab[0]):
             usual_sab = (int(type_sab.group(1)), len(type_spells))
         if type_caster_level:
             caster_level = int(type_caster_level.group(1))
