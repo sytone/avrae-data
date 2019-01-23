@@ -1,13 +1,13 @@
 import logging
 
 from lib.parsing import recursive_tag, render
-from lib.utils import dump, get_indexed_data, remove_ignored, get_data
+from lib.utils import dump, get_indexed_data, remove_ignored, get_data, diff
 
 SRD = ('Barbarian', 'Bard', 'Cleric', 'Druid', 'Fighter', 'Monk', 'Paladin', 'Ranger', 'Rogue', 'Sorcerer', 'Warlock',
        'Wizard')
 SRD_SUBCLASSES = ('College of Lore', 'Life Domain', 'Circle of the Land', 'Champion', 'Way of the Open Hand',
                   'Oath of Devotion', 'Hunter', 'Thief', 'Draconic Bloodline', 'The Fiend', 'School of Evocation')
-IGNORED_SOURCES = ('Stream',)
+IGNORED_SOURCES = ('Stream', 'UASidekicks')
 
 log = logging.getLogger("classes")
 
@@ -17,6 +17,7 @@ def get_classes_from_web():
 
 
 def filter_ignored(data):
+    data = remove_ignored(data, IGNORED_SOURCES)
     for _class in data:
         _class['subclasses'] = remove_ignored(_class['subclasses'], IGNORED_SOURCES)
     return data
@@ -176,6 +177,8 @@ def run():
     classfeats.extend(parse_invocations())
     dump(data, 'classes.json')
     dump(classfeats, 'classfeats.json')
+    diff('classes.json')
+    diff('classfeats.json')
 
 
 if __name__ == '__main__':
