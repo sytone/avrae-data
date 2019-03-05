@@ -1,7 +1,7 @@
 import logging
 
 from lib.parsing import render
-from lib.utils import get_data, dump
+from lib.utils import get_data, dump, diff
 
 log = logging.getLogger("backgrounds")
 
@@ -83,6 +83,7 @@ def run():
     data = parse(data)
     data = srdfilter(data)
     dump(data, 'backgrounds.json')
+    diff('backgrounds.json')
 
 
 if __name__ == '__main__':

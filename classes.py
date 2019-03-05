@@ -1,13 +1,14 @@
 import logging
 
 from lib.parsing import recursive_tag, render
-from lib.utils import dump, get_indexed_data, remove_ignored, get_data, diff
+from lib.utils import dump, get_indexed_data, remove_ignored, get_data, diff, fix_dupes
 
 SRD = ('Barbarian', 'Bard', 'Cleric', 'Druid', 'Fighter', 'Monk', 'Paladin', 'Ranger', 'Rogue', 'Sorcerer', 'Warlock',
        'Wizard')
 SRD_SUBCLASSES = ('College of Lore', 'Life Domain', 'Circle of the Land', 'Champion', 'Way of the Open Hand',
                   'Oath of Devotion', 'Hunter', 'Thief', 'Draconic Bloodline', 'The Fiend', 'School of Evocation')
 IGNORED_SOURCES = ('Stream', 'UASidekicks')
+SOURCE_HIERARCHY = ('MTF', 'VGM', 'XGE', 'PHB', 'DMG', 'GGR', 'SCAG', 'UAWGtE', 'UA', 'nil')
 
 log = logging.getLogger("classes")
 
@@ -168,11 +169,19 @@ def parse_invocations():
     return out
 
 
+def fix_subclass_dupes(data):
+    for _class in data:
+        if 'subclasses' in _class:
+            _class['subclasses'] = fix_dupes(_class['subclasses'], SOURCE_HIERARCHY)
+    return data
+
+
 def run():
     data = get_classes_from_web()
     data = filter_ignored(data)
     data = srdfilter(data)
     data = recursive_tag(data)
+    data = fix_subclass_dupes(data)
     classfeats = parse_classfeats(data)
     classfeats.extend(parse_invocations())
     dump(data, 'classes.json')
