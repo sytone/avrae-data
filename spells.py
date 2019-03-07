@@ -59,17 +59,32 @@ def parsetime(spell):
     log.debug(f"{spell['name']} time: {time}")
 
 
+def plural_to_single(unit):
+    return {
+        'feet': 'foot'
+    }.get(unit, unit.rstrip('s'))
+
+
 def parserange(spell):
     rangedata = spell['range']
-    if rangedata['type'] != 'special':
+    if rangedata['type'] == 'special':
+        range_ = 'Special'
+    elif rangedata['type'] == 'point':
         distance = rangedata['distance']
         unit = distance['type']
         if 'amount' in distance:
+            if distance['amount'] == 1:
+                unit = plural_to_single(unit)
             range_ = f"{distance['amount']} {unit}"
         else:
             range_ = unit.title()
     else:
-        range_ = 'Special'
+        distance = rangedata['distance']
+        unit = plural_to_single(distance['type'])
+        if 'amount' in distance:
+            range_ = f"Self ({distance['amount']} {unit} {rangedata['type']})"
+        else:
+            range_ = f"Self ({unit.title()} {rangedata['type']})"
     spell['range'] = range_
     log.debug(f"{spell['name']} range: {range_}")
 
