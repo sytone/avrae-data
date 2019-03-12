@@ -5,7 +5,7 @@ import sys
 import requests
 
 from lib.parsing import render, recursive_tag
-from lib.utils import get_json, dump, diff
+from lib.utils import get_json, dump, diff, get_indexed_data
 
 NEW_AUTOMATION = "oldauto" not in sys.argv
 VERB_TRANSFORM = {'dispel': 'dispelled', 'discharge': 'discharged'}
@@ -25,23 +25,7 @@ with open('srd/srd-spells.txt') as f:
 
 
 def get_spells():
-    try:
-        with open('cache/spells.json') as f:
-            spells = json.load(f)
-            log.info("Loaded spell data from cache")
-    except FileNotFoundError:
-        index = get_json('spells/index.json')
-        spells = []
-        for src, file in index.items():
-            if any(ig in file for ig in IGNORED_FILES):
-                log.info(f"Skipping file {file}")
-                continue
-            data = get_json(f"spells/{file}")
-            spells.extend(data['spell'])
-            log.info(f"  Processed {file}: {len(data['spell'])} spells")
-        with open('cache/spells.json', 'w') as f:
-            json.dump(spells, f, indent=2)
-    return spells
+    return get_indexed_data('spells/', 'spells.json', 'spell')
 
 
 def parsetime(spell):

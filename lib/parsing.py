@@ -100,8 +100,9 @@ PARSING = {'hit': lambda e: f"{int(e):+}",
            'atk': lambda e: f"{ATK_TYPES.get(e, 'Unknown')} Attack:",
            'scaledice': lambda e: e.split('|')[-1],
            'book': lambda e: e.split('|')[0],
-           'h': lambda e: "Hit: "}
-DEFAULT = ['dice', 'condition', 'skill', 'action', 'creature', 'item', 'spell', 'damage', 'race', 'background',
+           'h': lambda e: "Hit: ",
+           'dice': lambda e: e.split('|')[-1]}
+DEFAULT = ['condition', 'skill', 'action', 'creature', 'item', 'spell', 'damage', 'race', 'background',
            '5etools', 'class']
 
 

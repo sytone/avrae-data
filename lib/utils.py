@@ -51,7 +51,8 @@ def get_indexed_data(root, cache_name, root_key):
         index = get_json(f'{root}index.json')
         out = []
         for src, file in index.items():
-            if '3pp' in src:
+            if '3pp' in src or 'Stream' in src:
+                log.info(f"Skipped {file}: {src}")
                 continue
             data = get_json(f"{root}{file}")
             out.extend(data[root_key])
