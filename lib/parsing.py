@@ -103,7 +103,7 @@ PARSING = {'hit': lambda e: f"{int(e):+}",
            'h': lambda e: "Hit: ",
            'dice': lambda e: e.split('|')[-1]}
 DEFAULT = ['condition', 'skill', 'action', 'creature', 'item', 'spell', 'damage', 'race', 'background',
-           '5etools', 'class']
+           '5etools', 'class', 'table', 'sense']
 
 
 def parse_data_formatting(text):
