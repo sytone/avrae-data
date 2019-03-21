@@ -1,8 +1,8 @@
 import logging
 import re
 
-from lib.parsing import render, recursive_tag
-from lib.utils import get_data, dump, diff
+from lib.parsing import recursive_tag, render
+from lib.utils import diff, dump, get_data, srdonly
 
 log = logging.getLogger("items")
 
@@ -178,8 +178,9 @@ def run():
     data = prerender(data)
     sitedata = site_render(data)
     dump(data, 'items.json')
-    diff('items.json')
     dump(sitedata, 'template-items.json')
+    dump(srdonly(data), 'srd-items.json')
+    diff('srd-items.json')
 
 
 if __name__ == '__main__':

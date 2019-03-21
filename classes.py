@@ -1,7 +1,7 @@
 import logging
 
 from lib.parsing import recursive_tag, render
-from lib.utils import dump, get_indexed_data, remove_ignored, get_data, diff, fix_dupes
+from lib.utils import diff, dump, fix_dupes, get_data, get_indexed_data, remove_ignored, srdonly
 
 SRD = ('Barbarian', 'Bard', 'Cleric', 'Druid', 'Fighter', 'Monk', 'Paladin', 'Ranger', 'Rogue', 'Sorcerer', 'Warlock',
        'Wizard')
@@ -176,6 +176,14 @@ def fix_subclass_dupes(data):
     return data
 
 
+def class_srdonly(data):
+    for klass in data:
+        if 'subclasses' not in klass:
+            continue
+        klass['subclasses'] = srdonly(klass['subclasses'])
+    return srdonly(data)
+
+
 def run():
     data = get_classes_from_web()
     data = filter_ignored(data)
@@ -186,8 +194,10 @@ def run():
     classfeats.extend(parse_invocations())
     dump(data, 'classes.json')
     dump(classfeats, 'classfeats.json')
-    diff('classes.json')
-    diff('classfeats.json')
+    dump(class_srdonly(data), 'srd-classes.json')
+    diff('srd-classes.json')
+    dump(srdonly(classfeats), 'srd-classfeats.json')
+    diff('srd-classfeats.json')
 
 
 if __name__ == '__main__':

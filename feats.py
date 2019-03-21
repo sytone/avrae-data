@@ -1,7 +1,7 @@
 import logging
 
 from lib.parsing import render, ABILITY_MAP
-from lib.utils import get_data, dump, fix_dupes, diff, english_join
+from lib.utils import get_data, dump, fix_dupes, diff, english_join, srdonly
 
 log = logging.getLogger("feats")
 
@@ -84,7 +84,8 @@ def run():
     data = srdfilter(data)
     data = fix_dupes(data, SOURCE_HIERARCHY, True)
     dump(data, 'feats.json')
-    diff('feats.json')
+    dump(srdonly(data), 'srd-feats.json')
+    diff('srd-feats.json')
 
 
 if __name__ == '__main__':

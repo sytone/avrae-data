@@ -1,7 +1,7 @@
 import copy
 import logging
 
-from lib.utils import dump, fix_dupes, remove_ignored, explicit_sources, get_data
+from lib.utils import diff, dump, explicit_sources, fix_dupes, get_data, remove_ignored, srdonly
 
 SRD = ('Dragonborn', 'Half-Elf', 'Half-Orc', 'Elf (High)', 'Dwarf (Hill)', 'Human', 'Human (Variant)',
        'Halfling (Lightfoot)', 'Gnome (Rock)', 'Tiefling')
@@ -62,6 +62,8 @@ def run():
     data = remove_ignored(data, IGNORED_SOURCES)
     data = srdfilter(data)
     dump(data, 'races.json')
+    dump(srdonly(data), 'srd-races.json')
+    diff('srd-races.json')
 
 
 if __name__ == '__main__':

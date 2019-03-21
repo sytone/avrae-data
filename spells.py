@@ -5,7 +5,7 @@ import sys
 import requests
 
 from lib.parsing import render, recursive_tag
-from lib.utils import get_json, dump, diff, get_indexed_data
+from lib.utils import get_json, dump, diff, get_indexed_data, srdonly
 
 NEW_AUTOMATION = "oldauto" not in sys.argv
 VERB_TRANSFORM = {'dispel': 'dispelled', 'discharge': 'discharged'}
@@ -408,7 +408,8 @@ def run():
     data = get_spells()
     processed = parse(data)
     dump(processed, 'spells.json')
-    diff('spells.json')
+    dump(srdonly(processed), 'srd-spells.json')
+    diff('srd-spells.json')
     dump(get_auto_only(processed), 'spellauto.json')
 
     site_templates = site_parse(processed)

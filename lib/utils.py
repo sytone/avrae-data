@@ -140,3 +140,7 @@ def english_join(l):
         return ' or '.join(l)
     else:
         return ', '.join(l[:-1]) + f', or {l[-1]}'
+
+
+def srdonly(data):
+    return [b for b in data if b['srd']]

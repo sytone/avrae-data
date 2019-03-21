@@ -235,7 +235,8 @@ def run():
     rendered = recursive_tag(rendered)
     out = parse_attacks(rendered)
     dump(out, 'bestiary.json')
-    diff('bestiary.json')
+    dump(srdonly(data), 'srd-bestiary.json')
+    diff('srd-bestiary.json')
 
 
 if __name__ == '__main__':

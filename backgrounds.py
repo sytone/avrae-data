@@ -1,11 +1,11 @@
 import logging
 
 from lib.parsing import render
-from lib.utils import get_data, dump, diff
+from lib.utils import diff, dump, get_data, srdonly
 
 log = logging.getLogger("backgrounds")
 
-SRD = ['Acolyte']
+SRD = ['Acolyte', 'Criminal', 'Folk Hero', 'Noble', 'Sage', 'Soldier']
 PROF_KEYS = ("skillProficiencies", "languageProficiencies", "toolProficiencies")
 
 
@@ -83,7 +83,8 @@ def run():
     data = parse(data)
     data = srdfilter(data)
     dump(data, 'backgrounds.json')
-    diff('backgrounds.json')
+    dump(srdonly(data), 'srd-backgrounds.json')
+    diff('srd-backgrounds.json')
 
 
 if __name__ == '__main__':
