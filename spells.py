@@ -295,10 +295,10 @@ def spell_context(spell):
     return context
 
 
-def ensure_ml_order(spells):
+def ensure_ml_order(spells, srd=False):
     log.info("Attempting to put spells in ML order...")
     try:
-        with open('in/map-spell.json') as f:
+        with open(f'in/map-{"srd-" if srd else ""}spell.json') as f:
             spell_map_dict = json.load(f)
     except FileNotFoundError:
         log.warning(f"ML spell map not found. Spell order may not match ML outputs.")
@@ -408,7 +408,8 @@ def run():
     data = get_spells()
     processed = parse(data)
     dump(processed, 'spells.json')
-    dump(srdonly(processed), 'srd-spells.json')
+    srd = ensure_ml_order(srdonly(processed), True)
+    dump(srd, 'srd-spells.json')
     diff('srd-spells.json')
     dump(get_auto_only(processed), 'spellauto.json')
 
