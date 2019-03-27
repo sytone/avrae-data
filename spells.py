@@ -1,11 +1,12 @@
+import copy
 import json
 import logging
 import sys
 
 import requests
 
-from lib.parsing import render, recursive_tag
-from lib.utils import get_json, dump, diff, get_indexed_data, srdonly
+from lib.parsing import recursive_tag, render
+from lib.utils import diff, dump, get_indexed_data, srdonly
 
 NEW_AUTOMATION = "oldauto" not in sys.argv
 VERB_TRANSFORM = {'dispel': 'dispelled', 'discharge': 'discharged'}
@@ -140,14 +141,6 @@ def parseclasses(spell):
     log.debug(f"{spell['name']} subclasses: {subclasses}")
 
 
-def srdfilter(spell):
-    if spell['name'].lower() in srd_spells:
-        spell['srd'] = True
-    else:
-        spell['srd'] = False
-    log.debug(f"{spell['name']} srd: {spell['srd']}")
-
-
 def get_automation(spell):
     try:
         auto_spell = next(s for s in auto_spells if s['name'] == spell['name'])
@@ -263,7 +256,7 @@ def spell_context(spell):
             if spell.get('save', {}).get('save').lower() + " saving throw" in s.lower():
                 _sent = []
                 for sentence in sentences[i:i + 3]:
-                    if not '\n\n' in sentence:
+                    if '\n\n' not in sentence:
                         _sent.append(sentence)
                     else:
                         break
@@ -281,7 +274,7 @@ def spell_context(spell):
             if " spell attack" in s.lower():
                 _sent = []
                 for sentence in sentences[i:i + 3]:
-                    if not '\n\n' in sentence:
+                    if '\n\n' not in sentence:
                         _sent.append(sentence)
                     else:
                         break
@@ -329,7 +322,6 @@ def parse(data):
         parsecomponents(spell)
         parseduration(spell)
         parseclasses(spell)
-        srdfilter(spell)
 
         ritual = spell.get('meta', {}).get('ritual', False)
         desc = render(spell['entries'])
@@ -361,7 +353,6 @@ def parse(data):
             "page": spell.get('page', '?'),
             "concentration": spell['concentration'],
             "automation": automation,
-            "srd": spell['srd']
         }
         processed.append(recursive_tag(newspell))
 
@@ -404,9 +395,42 @@ def site_parse_components(components):
     return out
 
 
+def srdfilter(data):
+    transforms = {}
+    with open('srd/srd-spells.txt') as f:
+        for srdspell in f.read().split('\n'):
+            if ':' in srdspell:
+                old, new = srdspell.split(':')
+            else:
+                old = new = srdspell
+            transforms[old.lower().strip()] = new.lower().strip()
+    found = set()
+
+    for spell in data:
+        spell_name = spell['name'].lower()
+        if spell_name in transforms:
+            if transforms[spell_name] == spell_name:
+                spell['srd'] = True
+                found.add(spell['name'].lower())
+            else:
+                new_spell = copy.deepcopy(spell)
+                new_spell['name'] = transforms[spell_name].title()
+                transforms[transforms[spell_name]] = transforms[spell_name]  # make sure we grab it
+                data.append(new_spell)
+                spell['srd'] = False
+        else:
+            spell['srd'] = False
+
+    not_found = [s for s in transforms.values() if s not in found]
+    log.warning(f"These SRD spells were not found: {', '.join(not_found)}")
+    return data
+
+
 def run():
     data = get_spells()
     processed = parse(data)
+    processed = srdfilter(processed)
+
     dump(processed, 'spells.json')
     srd = ensure_ml_order(srdonly(processed), True)
     dump(srd, 'srd-spells.json')

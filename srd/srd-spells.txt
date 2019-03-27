@@ -1,4 +1,4 @@
-Acid Arrow
+Melf's Acid Arrow:Acid Arrow
 Acid Splash
 Aid
 Alarm
@@ -12,10 +12,10 @@ Antilife Shell
 Antimagic Field
 Antipathy/Sympathy
 Arcane Eye
-Arcane Hand
+Bigby's Hand:Arcane Hand
 Arcane Lock
-Arcane Sword
-Arcanist’s Magic Aura
+Mordenkainen's Sword:Arcane Sword
+Nystul's Magic Aura:Arcanist's Magic Aura
 Astral Projection
 Augury
 Awaken
@@ -24,7 +24,7 @@ Banishment
 Barkskin
 Beacon of Hope
 Bestow Curse
-Black Tentacles
+Evard's Black Tentacles:Black Tentacles
 Blade Barrier
 Bless
 Blight
@@ -32,6 +32,7 @@ Blindness/Deafness
 Blink
 Blur
 Burning Hands
+Branding Smite
 Call Lightning
 Calm Emotions
 Chain Lightning
@@ -102,7 +103,7 @@ Expeditious Retreat
 Eyebite
 Fabricate
 Faerie Fire
-Faithful Hound
+Mordenkainen's Faithful Hound:Faithful Hound
 False Life
 Fear
 Feather Fall
@@ -120,14 +121,14 @@ Flame Blade
 Flame Strike
 Flaming Sphere
 Flesh to Stone
-Floating Disk
+Tenser's Floating Disk:Floating Disk
 Fly
 Fog Cloud
 Forbiddance
 Forcecage
 Foresight
 Freedom of Movement
-Freezing Sphere
+Otiluke's Freezing Sphere:Freezing Sphere
 Gaseous Form
 Gate
 Geas
@@ -153,13 +154,13 @@ Heal
 Healing Word
 Heat Metal
 Hellish Rebuke
-Heroes’ Feast
+Heroes' Feast
 Heroism
-Hideous Laughter
+Tasha's Hideous Laughter:Hideous Laughter
 Hold Monster
 Hold Person
 Holy Aura
-Hunter’s Mark
+Hunter's Mark
 Hypnotic Pattern
 Ice Storm
 Identify
@@ -168,9 +169,9 @@ Imprisonment
 Incendiary Cloud
 Inflict Wounds
 Insect Plague
-Instant Summons
+Drawmij's Instant Summons:Instant Summons
 Invisibility
-Irresistible Dance
+Otto's Irresistible Dance:Irresistible Dance
 Jump
 Knock
 Legend Lore
@@ -189,7 +190,7 @@ Magic Jar
 Magic Missile
 Magic Mouth
 Magic Weapon
-Magnificent Mansion
+Mordenkainen's Magnificent Mansion:Magnificent Mansion
 Major Image
 Mass Cure Wounds
 Mass Heal
@@ -226,7 +227,7 @@ Prayer of Healing
 Prestidigitation
 Prismatic Spray
 Prismatic Wall
-Private Sanctum
+Mordenkainen's Private Sanctum:Private Sanctum
 Produce Flame
 Programmed Illusion
 Project Image
@@ -240,6 +241,7 @@ Ray of Frost
 Regenerate
 Reincarnate
 Remove Curse
+Otiluke's Resilient Sphere:Resilient Sphere
 Resistance
 Resurrection
 Reverse Gravity
@@ -249,7 +251,7 @@ Sacred Flame
 Sanctuary
 Scorching Ray
 Scrying
-Secret Chest
+Leomund's Secret Chest:Secret Chest
 See Invisibility
 Seeming
 Sending
@@ -266,6 +268,7 @@ Simulacrum
 Sleep
 Sleet Storm
 Slow
+Spare the Dying
 Speak with Animals
 Speak with Dead
 Speak with Plants
@@ -282,13 +285,13 @@ Sunbeam
 Sunburst
 Symbol
 Telekinesis
-Telepathic Bond
+Rary's Telepathic Bond:Telepathic Bond
 Teleport
 Teleportation Circle
 Thaumaturgy
 Thunderwave
 Time Stop
-Tiny Hut
+Leomund's Tiny Hut:Tiny Hut
 Tongues
 Transport via Plants
 Tree Stride
