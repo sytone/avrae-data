@@ -6,25 +6,25 @@ Amulet of Health
 Amulet of Proof against Detection and Location
 Amulet of the Planes
 Animated Shield
-Apparatus of the Crab
+Apparatus of Kwalish:Apparatus of the Crab
 Armor +1
 Armor +2
 Armor +3
 Armor of Invulnerability
-Armor of Resistance
-Armor of Vulnerability
+Armor of * Resistance
+Armor of Vulnerability (*)
 Arrow-Catching Shield
-Arrow of Slaying
+Arrow of Slaying (Generic)
 Bag of Beans
 Bag of Devouring
 Bag of Holding
 Bag of Tricks
-Gray Bag of Tricks
-Rust Bag of Tricks
-Tan Bag of Tricks
+Bag of Tricks, Gray
+Bag of Tricks, Rust
+Bag of Tricks, Tan
 Bead of Force
 Belt of Dwarvenkind
-Belt of Giant Strength
+Belt of * Giant Strength
 Berserker Axe
 Boots of Elvenkind
 Boots of Levitation
@@ -39,7 +39,7 @@ Brooch of Shielding
 Broom of Flying
 Candle of Invocation
 Cape of the Mountebank
-Carpet of Flying
+Carpet of Flying, *
 Censer of Controlling Air Elementals
 Chime of Opening
 Circlet of Blasting
@@ -51,7 +51,6 @@ Cloak of the Bat
 Cloak of the Manta Ray
 Crystal Ball
 Cube of Force
-Cube of Force Faces
 Cubic Gate
 Dagger of Venom
 Dancing Sword
@@ -62,24 +61,23 @@ Avatar of Death
 Defender
 Demon Armor
 Dimensional Shackles
-Dragon Scale Mail
+* Dragon Scale Mail
 Dragon Slayer
 Dust of Disappearance
 Dust of Dryness
 Dust of Sneezing and Choking
 Dwarven Plate
 Dwarven Thrower
-Efficient Quiver
+Quiver of Ehlonna:Efficient Quiver
 Efreeti Bottle
-Elemental Gem
+Elemental Gem, *
 Elven Chain
 Eversmoking Bottle
 Eyes of Charming
 Eyes of Minute Seeing
 Eyes of the Eagle
 Feather Token
-Figurine of Wondrous Power
-Giant Fly
+Figurine of Wondrous Power, *
 Flame Tongue
 Folding Boat
 Frost Brand
@@ -92,7 +90,7 @@ Gloves of Missile Snaring
 Gloves of Swimming and Climbing
 Goggles of Night
 Hammer of Thunderbolts
-Handy Haversack
+Heward's Handy Haversack:Handy Haversack
 Hat of Disguise
 Headband of Intellect
 Helm of Brilliance
@@ -101,13 +99,13 @@ Helm of Telepathy
 Helm of Teleportation
 Holy Avenger
 Horn of Blasting
-Horn of Valhalla
+Horn of Valhalla, *
 Horseshoes of a Zephyr
 Horseshoes of Speed
 Immovable Rod
-Instant Fortress
-Ioun Stone
-Iron Bands of Binding
+Daern's Instant Fortress:Instant Fortress
+Ioun Stone, *
+Iron Bands of Bilarro:Iron Bands of Binding
 Iron Flask
 Javelin of Lightning
 Lantern of Revealing
@@ -118,9 +116,9 @@ Mace of Terror
 Mantle of Spell Resistance
 Manual of Bodily Health
 Manual of Gainful Exercise
-Manual of Golems
+Manual of * Golems
 Manual of Quickness of Action
-Marvelous Pigments
+Nolzur's Marvelous Pigments:Marvelous Pigments
 Medallion of Thoughts
 Mirror of Life Trapping
 Mithral Armor
@@ -147,21 +145,21 @@ Potion of Climbing
 Potion of Diminution
 Potion of Flying
 Potion of Gaseous Form
-Potion of Giant Strength
+Potion of * Giant Strength
 Potion of Growth
 Potion of Healing
-Potions of Healing
+Potion of * Healing
 Potion of Heroism
 Potion of Invisibility
 Potion of Mind Reading
 Potion of Poison
-Potion of Resistance
+Potion of * Resistance
 Potion of Speed
 Potion of Water Breathing
-Restorative Ointment
+Keoghtom's Ointment:Restorative Ointment
 Ring of Animal Influence
 Ring of Djinni Summoning
-Ring of Elemental Command
+Ring of * Elemental Command
 Ring of Evasion
 Ring of Feather Falling
 Ring of Free Action
@@ -170,7 +168,7 @@ Ring of Jumping
 Ring of Mind Shielding
 Ring of Protection
 Ring of Regeneration
-Ring of Resistance
+Ring of * Resistance
 Ring of Shooting Stars
 Ring of Spell Storing
 Ring of Spell Turning
@@ -183,7 +181,7 @@ Ring of Water Walking
 Ring of X-ray Vision
 Robe of Eyes
 Robe of Scintillating Colors
-Robe of Robe of Stars
+Robe of Stars
 Robe of the Archmagi
 Robe of Useful Items
 Rod of Absorption
@@ -201,8 +199,8 @@ Shield +3
 Shield of Missile Attraction
 Slippers of Spider Climbing
 Sovereign Glue
-Spell Scroll
-Spell Scroll
+Spell Scroll (* Level)
+Spell Scroll (Cantrip)
 Spellguard Shield
 Sphere of Annihilation
 Staff of Charming
@@ -218,7 +216,7 @@ Staff of the Woodlands
 Staff of Thunder and Lightning
 Staff of Withering
 Stone of Controlling Earth Elementals
-Stone of Good Luck (Luckstone)
+Stone of Good Luck
 Sun Blade
 Sword of Life Stealing
 Sword of Sharpness
@@ -243,9 +241,9 @@ Wand of Magic Missiles
 Wand of Paralysis
 Wand of Polymorph
 Wand of Secrets
-Wand of the War Mage +1
-Wand of the War Mage +2
-Wand of the War Mage +3
+Wand of the War Mage, +1
+Wand of the War Mage, +2
+Wand of the War Mage, +3
 Wand of Web
 Wand of Wonder
 Weapon +1
@@ -259,7 +257,7 @@ Orb of Dragonkind
 
 Abacus
 Acid (vial)
-Alchemist’s fire (flask)
+Alchemist's fire (flask)
 Ammunition
 Arrows (20)
 Blowgun needles (5)
@@ -290,11 +288,11 @@ Case, map or scroll
 Chain (10 feet)
 Chalk (1 piece)
 Chest
-Climber’s kit
+Climber's kit
 Clothes, common
 Clothes, costume
 Clothes, fine
-Clothes, traveler’s
+Clothes, traveler's
 Component pouch
 Crowbar
 Druidic focus
@@ -307,7 +305,7 @@ Flask or tankard
 Grappling hook
 Hammer
 Hammer, sledge
-Healer’s kit
+Healer's kit
 Holy symbol
 Amulet
 Emblem
@@ -331,7 +329,7 @@ Oil (flask)
 Paper (one sheet)
 Parchment (one sheet)
 Perfume (vial)
-Pick, miner’s
+Pick, miner's
 Piton
 Poison, basic (vial)
 Pole (10-foot)
@@ -345,7 +343,7 @@ Robes
 Rope, hempen (50 feet)
 Rope, silk (50 feet)
 Sack
-Scale, merchant’s
+Scale, merchant's
 Sealing wax
 Shovel
 Signal whistle

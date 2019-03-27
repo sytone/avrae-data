@@ -1,3 +1,5 @@
+import copy
+import fnmatch
 import logging
 import re
 
@@ -72,14 +74,47 @@ def object_actions(objects):
 
 
 def srdfilter(data):
+    transforms = {}
+    patterns = []
     with open('srd/srd-items.txt') as f:
-        srd = [s.strip().lower() for s in f.read().split('\n')]
+        for srditem in f.read().split('\n'):
+            if ':' in srditem:
+                old, new = srditem.split(':')
+                transforms[old.lower().strip()] = new.lower().strip()
+            elif '*' in srditem:
+                patterns.append(srditem.lower().strip())
+            else:
+                transforms[srditem.lower().strip()] = srditem.lower().strip()
+    found = set()
 
     for item in data:
-        if item['name'].lower() in srd or (item.get('source') == 'PHB' and not item.get('wondrous')):
-            item['srd'] = True
+        is_srd = False
+        item_name = item['name'].lower()
+        if item.get('source') not in ('PHB', 'DMG', None):
+            is_srd = False
+        elif item.get('source') == 'PHB' and not item.get('wondrous'):
+            is_srd = True
+            found.add(item_name)
         else:
-            item['srd'] = False
+            if item_name in transforms:
+                if transforms[item_name] == item_name:
+                    is_srd = True
+                    found.add(item_name)
+                else:
+                    new_item = copy.deepcopy(item)
+                    new_item['name'] = transforms[item_name].title()
+                    transforms[transforms[item_name]] = transforms[item_name]  # make sure we grab it
+                    data.append(new_item)
+
+            for pattern in patterns:
+                if fnmatch.fnmatch(item_name, pattern):
+                    log.info(f"{item_name} matches {pattern}")
+                    is_srd = True
+                    found.add(item_name)
+        item['srd'] = is_srd
+
+    not_found = [s for s in transforms if s not in found]
+    log.warning(f"These SRD items were not found: {', '.join(not_found)}")
     return data
 
 
@@ -126,13 +161,13 @@ def site_render(data):
                 if iType == 'HA': damage = f"AC {item.get('ac', 'n/a')}"
                 if iType == 'SHP':  # ships
                     extras = f"Speed: {item.get('speed')}\nCarrying Capacity: {item.get('carryingcapacity')}\n" \
-                             f"Crew {item.get('crew')}, AC {item.get('vehAc')}, HP {item.get('vehHp')}"
+                        f"Crew {item.get('crew')}, AC {item.get('vehAc')}, HP {item.get('vehHp')}"
                     if 'vehDmgThresh' in item:
                         extras += f", Damage Threshold {item['vehDmgThresh']}"
                 if iType == 'siege weapon':
                     extras = f"Size: {SIZES.get(item.get('size'), 'Unknown')}\n" \
-                             f"AC {item.get('ac')}, HP {item.get('hp')}\n" \
-                             f"Immunities: {item.get('immune')}"
+                        f"AC {item.get('ac')}, HP {item.get('hp')}\n" \
+                        f"Immunities: {item.get('immune')}"
         else:
             type_ = ', '.join(
                 i for i in ("Wondrous Item" if item.get('wondrous') else '', item.get('technology')) if i)
