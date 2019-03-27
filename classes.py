@@ -5,8 +5,10 @@ from lib.utils import diff, dump, fix_dupes, get_data, get_indexed_data, remove_
 
 SRD = ('Barbarian', 'Bard', 'Cleric', 'Druid', 'Fighter', 'Monk', 'Paladin', 'Ranger', 'Rogue', 'Sorcerer', 'Warlock',
        'Wizard')
-SRD_SUBCLASSES = ('College of Lore', 'Life Domain', 'Circle of the Land', 'Champion', 'Way of the Open Hand',
-                  'Oath of Devotion', 'Hunter', 'Thief', 'Draconic Bloodline', 'The Fiend', 'School of Evocation')
+SRD_SUBCLASSES = (
+    'Path of the Berserker', 'College of Lore', 'Life Domain', 'Circle of the Land', 'Champion', 'Way of the Open Hand',
+    'Oath of Devotion', 'Hunter', 'Thief', 'Draconic Bloodline', 'The Fiend', 'School of Evocation'
+)
 IGNORED_SOURCES = ('Stream', 'UASidekicks')
 SOURCE_HIERARCHY = ('MTF', 'VGM', 'XGE', 'PHB', 'DMG', 'GGR', 'SCAG', 'UAWGtE', 'UA', 'nil')
 
@@ -84,7 +86,7 @@ def parse_classfeats(data):
                         for opt_entry in option.get('entries', []):
                             fe = {
                                 'name': f"{_class['name']}: {option['name']}: "
-                                        f"{_resolve_name(opt_entry)}",
+                                f"{_resolve_name(opt_entry)}",
                                 'text': render(opt_entry['entries']),
                                 'srd': subclass.get('srd', False)
                             }
@@ -105,7 +107,7 @@ def parse_classfeats(data):
                             for opt_entry in option.get('entries', []):
                                 fe = {
                                     'name': f"{_class['name']}: {subclass['name']}: {entry['name']}: "
-                                            f"{_resolve_name(opt_entry)}",
+                                    f"{_resolve_name(opt_entry)}",
                                     'text': render(opt_entry['entries']),
                                     'srd': subclass.get('srd', False)
                                 }
@@ -116,7 +118,7 @@ def parse_classfeats(data):
                         for opt_entry in subentries:
                             fe = {
                                 'name': f"{_class['name']}: {subclass['name']}: {entry['name']}: "
-                                        f"{_resolve_name(opt_entry)}",
+                                f"{_resolve_name(opt_entry)}",
                                 'text': f"{render(opt_entry['entries'])}",
                                 'srd': _class['srd']
 
