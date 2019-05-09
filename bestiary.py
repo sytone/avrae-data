@@ -9,6 +9,10 @@ ATTACK_RE = re.compile(r'(?:<i>)?(?:\w+ ){1,4}Attack:(?:</i>)? ([+-]?\d+) to hit
                        r'(?: or [+-]?\d+ \((.+?)\) (\w+) damage (?:\w+ ?)+[.,]?)?'
                        r'(?: ?plus [+-]?\d+ \((.+?)\) (\w+) damage)?', re.IGNORECASE)
 JUST_DAMAGE_RE = re.compile(r'[+-]?\d+ \((.+?)\) (\w+) damage', re.IGNORECASE)
+SKILL_NAMES = ('acrobatics', 'animalHandling', 'arcana', 'athletics', 'deception', 'history', 'initiative', 'insight',
+               'intimidation', 'investigation', 'medicine', 'nature', 'perception', 'performance', 'persuasion',
+               'religion', 'sleightOfHand', 'stealth', 'survival', 'strength', 'dexterity', 'constitution',
+               'intelligence', 'wisdom', 'charisma')
 log = logging.getLogger("bestiary")
 
 
@@ -90,6 +94,31 @@ def parse_ac(data):
         else:
             log.warning(f"Unknown AC type: {monster['ac']}")
             raise Exception
+    return data
+
+
+def translate_skills(data):
+    for monster in data:
+        log.info(f"Parsing {monster['name']} skills")
+        saves = monster.get('save', {})
+        skills = monster.get('skill', {})
+
+        new_saves = {}
+        new_skills = {}
+
+        for k, v in saves.items():
+            new_k = {"str": "strengthSave", "dex": "dexteritySave", "con": "constitutionSave",
+                     "int": "intelligenceSave", "wis": "wisdomSave", "cha": "charismaSave"}[k]
+            new_saves[new_k] = int(v)
+
+        for k, v in skills.items():
+            if k not in SKILL_NAMES:
+                continue
+            new_k = re.sub(r"\s+(\w)", lambda m: m.group(1).upper(), k.lower())  # spaced to upper
+            new_skills[new_k] = int(v)
+
+        monster['save'] = new_saves
+        monster['skill'] = new_skills
     return data
 
 
@@ -231,6 +260,7 @@ def run():
     data = parse_copies(data)
     data = srdfilter(data)
     data = parse_ac(data)
+    data = translate_skills(data)
     rendered = monster_render(data)
     rendered = recursive_tag(rendered)
     out = parse_attacks(rendered)
