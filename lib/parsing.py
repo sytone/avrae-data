@@ -9,7 +9,7 @@ ATTACK_TYPES = {"M": "Melee", "R": "Ranged", "W": "Weapon", "S": "Spell"}
 
 
 def render(text, md_breaks=False, join_char='\n'):
-    """Parses a list or string from astranauta data.
+    """Parses a list or string from data.
     :returns str - The final text."""
     if isinstance(text, dict):
         text = [text]
@@ -76,10 +76,10 @@ def render(text, md_breaks=False, join_char='\n'):
                     else:
                         out.append(f"{str(entry['roll']['min'])} - {str(entry['roll']['max'])}")
             else:
-                log.warning(f"Missing astranauta entry type parse: {entry}")
+                log.warning(f"Missing data entry type parse: {entry}")
 
         else:
-            log.warning(f"Unknown astranauta entry: {entry}")
+            log.warning(f"Unknown data entry: {entry}")
 
     return parse_data_formatting(join_str.join(out))
 
@@ -103,7 +103,7 @@ PARSING = {'hit': lambda e: f"{int(e):+}",
            'h': lambda e: "Hit: ",
            'dice': lambda e: e.split('|')[-1]}
 DEFAULT = ['condition', 'skill', 'action', 'creature', 'item', 'spell', 'damage', 'race', 'background',
-           '5etools', 'class', 'table', 'sense']
+           'class', 'table', 'sense']
 
 
 def parse_data_formatting(text):
@@ -112,16 +112,16 @@ def parse_data_formatting(text):
 
     def sub(match):
         log.debug(f"Rendering {match.group(0)}...")
-        if match.group(1) in DEFAULT:
-            out = SRC_FORMAT(match.group(2))
+        if match.group(1) in FORMATTING:
+            f = FORMATTING.get(match.group(1), '')
+            out = f"{f}{match.group(2)}{f}"
         elif match.group(1) in PARSING:
             f = PARSING.get(match.group(1), lambda e: e)
             out = f(match.group(2))
         else:
-            f = FORMATTING.get(match.group(1), '')
-            if not match.group(1) in FORMATTING:
-                log.warning(f"Unknown tag: {match.group(0)}")
-            out = f"{f}{match.group(2)}{f}"
+            out = SRC_FORMAT(match.group(2))
+            if not match.group(1) in DEFAULT:
+                log.warning(f"Possible unknown tag: {match.group(0)}")
         log.debug(f"Replaced with {out}")
         return out
 

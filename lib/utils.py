@@ -6,7 +6,7 @@ import sys
 
 import requests
 
-DATA_SRC = "https://5etools.com/data/"
+DATA_SRC = os.environ.get("DATA_SRC")
 LOGLEVEL = logging.INFO if "debug" not in sys.argv else logging.DEBUG
 
 log_formatter = logging.Formatter('%(levelname)s:%(name)s: %(message)s')
