@@ -126,8 +126,8 @@ def prerender(data):
         else:
             item['desc'] = ""
 
-        if 'additionalEntries' in item:
-            item['desc'] += f"\n\n{render(item['additionalEntries'])}"
+        # if 'additionalEntries' in item:
+        #     item['desc'] += f"\n\n{render(item['additionalEntries'])}"
         item['desc'] = item['desc'].strip()
 
         for k, v in item.items():
